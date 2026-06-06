@@ -1,0 +1,16 @@
+package cli
+
+import (
+	"context"
+
+	"google.golang.org/adk/agent"
+	"google.golang.org/adk/runner"
+	"google.golang.org/adk/session"
+
+	"github.com/ai4next/pegasus/internal/config"
+	"github.com/ai4next/pegasus/internal/tui"
+)
+
+func runTUI(ctx context.Context, a agent.Agent, cfg *config.Config, pluginCfg runner.PluginConfig, sessSvc session.Service) error {
+	return tui.Run(ctx, a, cfg, pluginCfg, sessSvc)
+}
