@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/ai4next/pegasus/internal/global"
 	"google.golang.org/adk/tool"
 	"google.golang.org/adk/tool/functiontool"
 )
@@ -81,7 +82,7 @@ func runDelegateTool(ctx context.Context, deps Dependencies, input delegateInput
 		if err != nil {
 			return delegateOutput{}, err
 		}
-		status := firstNonEmpty(receipt.Status, "queued")
+		status := global.FirstNonEmpty(receipt.Status, "queued")
 		return delegateOutput{
 			TaskID: receipt.TaskID,
 			Status: status,
@@ -109,13 +110,4 @@ func delegateMode(input delegateInput) string {
 	default:
 		return mode
 	}
-}
-
-func firstNonEmpty(values ...string) string {
-	for _, value := range values {
-		if value != "" {
-			return value
-		}
-	}
-	return ""
 }

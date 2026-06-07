@@ -167,7 +167,7 @@ func runPromptInput(args []string, stdin io.Reader) (string, error) {
 func buildRunRequest(cfg *config.Config, sessionService adksession.Service, prompt string) pegasusruntime.RunRequest {
 	return pegasusruntime.RunRequest{
 		AppName:    cfg.Session.AppName,
-		UserID:     firstNonEmpty(runUser, "cli-user"),
+		UserID:     global.FirstNonEmpty(runUser, "cli-user"),
 		SessionID:  runSession,
 		Message:    genai.NewContentFromText(prompt, genai.RoleUser),
 		StateDelta: pegasusruntime.PromptStateDelta(cfg.Workspace, prompt),

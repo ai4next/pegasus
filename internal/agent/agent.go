@@ -20,6 +20,7 @@ import (
 
 	"github.com/ai4next/pegasus/internal/config"
 	"github.com/ai4next/pegasus/internal/expert"
+	"github.com/ai4next/pegasus/internal/global"
 	"github.com/ai4next/pegasus/internal/hook"
 	"github.com/ai4next/pegasus/internal/memory"
 	"github.com/ai4next/pegasus/internal/prompt"
@@ -81,7 +82,7 @@ func DescribeConfiguredToolsets(cfg *config.Config) []ToolsetDescriptor {
 		}
 		source := strings.TrimSpace(strings.Join(append([]string{server.Command}, server.Args...), " "))
 		out = append(out, ToolsetDescriptor{
-			Name:                 "mcp:" + firstNonEmpty(server.Name, server.Command),
+			Name:                 "mcp:" + global.FirstNonEmpty(server.Name, server.Command),
 			Kind:                 "mcp",
 			Source:               source,
 			Tools:                append([]string(nil), server.Tools...),
@@ -189,11 +190,11 @@ func buildMCPToolsets(cfg *config.Config) []adktool.Toolset {
 			RequireConfirmationProvider: nil,
 		})
 		if err != nil {
-			log.Printf("[agent] mcp toolset %s: %v", firstNonEmpty(server.Name, server.Command), err)
+			log.Printf("[agent] mcp toolset %s: %v", global.FirstNonEmpty(server.Name, server.Command), err)
 			continue
 		}
-		toolsets = append(toolsets, namedToolset{name: "mcp:" + firstNonEmpty(server.Name, server.Command), Toolset: ts})
-		log.Printf("[agent] mcp toolset configured: %s", firstNonEmpty(server.Name, server.Command))
+		toolsets = append(toolsets, namedToolset{name: "mcp:" + global.FirstNonEmpty(server.Name, server.Command), Toolset: ts})
+		log.Printf("[agent] mcp toolset configured: %s", global.FirstNonEmpty(server.Name, server.Command))
 	}
 	return toolsets
 }
@@ -215,15 +216,6 @@ func (n namedToolset) Name() string {
 		return n.name
 	}
 	return n.Toolset.Name()
-}
-
-func firstNonEmpty(values ...string) string {
-	for _, value := range values {
-		if value != "" {
-			return value
-		}
-	}
-	return ""
 }
 
 // New creates a new Pegasus agent with all registered tools, optional SOP rules,

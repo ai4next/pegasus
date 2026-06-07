@@ -828,7 +828,7 @@ func (s *Service) SetSummary(appName, userID, sessionID, summary string) (Messag
 	}
 	now := time.Now()
 	msg := Message{
-		ID:        firstNonEmpty(stored.SummaryMessageID, uuid.NewString()),
+		ID:        global.FirstNonEmpty(stored.SummaryMessageID, uuid.NewString()),
 		SessionID: sessionID,
 		Role:      MessageAssistant,
 		Content:   summary,
@@ -1440,7 +1440,7 @@ func ProjectEvent(sessionID string, event *adksession.Event) []Message {
 				InvocationID: event.InvocationID,
 				Role:         MessageTool,
 				ToolName:     part.FunctionCall.Name,
-				ToolID:       firstNonEmpty(part.FunctionCall.ID, part.FunctionCall.Name),
+					ToolID:       global.FirstNonEmpty(part.FunctionCall.ID, part.FunctionCall.Name),
 				Args:         string(args),
 				Status:       "running",
 				CreatedAt:    event.Timestamp,
@@ -1456,7 +1456,7 @@ func ProjectEvent(sessionID string, event *adksession.Event) []Message {
 				InvocationID: event.InvocationID,
 				Role:         MessageTool,
 				ToolName:     part.FunctionResponse.Name,
-				ToolID:       firstNonEmpty(part.FunctionResponse.ID, part.FunctionResponse.Name),
+				ToolID:       global.FirstNonEmpty(part.FunctionResponse.ID, part.FunctionResponse.Name),
 				Result:       string(resp),
 				Status:       toolStatus(part.FunctionResponse.Response),
 				CreatedAt:    event.Timestamp,
@@ -1894,15 +1894,6 @@ func cloneEvent(event *adksession.Event) *adksession.Event {
 
 func sessionKey(appName, userID, sessionID string) string {
 	return appName + "\x00" + userID + "\x00" + sessionID
-}
-
-func firstNonEmpty(values ...string) string {
-	for _, value := range values {
-		if value != "" {
-			return value
-		}
-	}
-	return ""
 }
 
 func toolStatus(resp map[string]any) string {

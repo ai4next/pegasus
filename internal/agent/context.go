@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/ai4next/pegasus/internal/global"
 	pegasussession "github.com/ai4next/pegasus/internal/session"
 	adkagent "google.golang.org/adk/agent"
 	"google.golang.org/adk/model"
@@ -269,7 +270,7 @@ func applyToolResultBudget(window *sessionContext) {
 
 func persistedToolResultPlaceholder(msg *pegasussession.Message, result string) string {
 	preview := trimRunes(strings.Join(strings.Fields(result), " "), 2000)
-	label := firstNonEmpty(msg.ToolID, msg.ToolName, msg.ID, "unknown")
+	label := global.FirstNonEmpty(msg.ToolID, msg.ToolName, msg.ID, "unknown")
 	return fmt.Sprintf("<persisted-output>\nTool result %s exceeded the context budget and was compacted in session context.\nPreview:\n%s\n</persisted-output>", label, preview)
 }
 

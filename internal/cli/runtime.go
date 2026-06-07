@@ -140,19 +140,15 @@ func runtimeEventDetail(event bus.Event) string {
 	case bus.EventTextDelta:
 		return singleLine(event.Text)
 	case bus.EventToolCallStarted:
-		return firstNonEmpty(event.ToolName, event.ToolID) + " " + singleLine(event.Args)
+		return global.FirstNonEmpty(event.ToolName, event.ToolID) + " " + singleLine(event.Args)
 	case bus.EventToolCallFinished:
-		return strings.TrimSpace(firstNonEmpty(event.ToolName, event.ToolID) + " " + event.Status + " " + singleLine(event.Result))
+		return strings.TrimSpace(global.FirstNonEmpty(event.ToolName, event.ToolID) + " " + event.Status + " " + singleLine(event.Result))
 	case bus.EventPermissionRequested, bus.EventPermissionGranted, bus.EventPermissionDenied:
-		return strings.TrimSpace(firstNonEmpty(event.ToolName, event.ToolID) + " " + event.Status)
+		return strings.TrimSpace(global.FirstNonEmpty(event.ToolName, event.ToolID) + " " + event.Status)
 	case bus.EventRunFailed, bus.EventEvolutionFailed:
 		return event.Error
-	case bus.EventEvolutionFinished:
-		return event.Path
-	case bus.EventSessionCompacted:
-		return fmt.Sprintf("messages=%d", event.Count)
 	default:
-		return firstNonEmpty(event.Error, event.ToolName, event.Path, event.Role)
+		return global.FirstNonEmpty(event.Error, event.ToolName, event.Path, event.Role)
 	}
 }
 
