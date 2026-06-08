@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/ai4next/pegasus/internal/global"
 	adksession "google.golang.org/adk/session"
 	"google.golang.org/adk/tool/toolconfirmation"
 	"google.golang.org/genai"
@@ -73,7 +74,7 @@ func FromADKEvent(sessionID string, event *adksession.Event) []Event {
 					out = append(out, confirmationEvent(sessionID, event, part.FunctionCall))
 					continue
 				}
-				toolID := firstNonEmpty(part.FunctionCall.ID, part.FunctionCall.Name)
+				toolID := global.FirstNonEmpty(part.FunctionCall.ID, part.FunctionCall.Name)
 				out = append(out, Event{
 					Type:       EventToolCallStarted,
 					SessionID:  sessionID,
@@ -92,7 +93,7 @@ func FromADKEvent(sessionID string, event *adksession.Event) []Event {
 					RunID:     event.InvocationID,
 					EventID:   event.ID,
 					At:        event.Timestamp,
-					ToolID:    firstNonEmpty(part.FunctionResponse.ID, part.FunctionResponse.Name),
+					ToolID:    global.FirstNonEmpty(part.FunctionResponse.ID, part.FunctionResponse.Name),
 					ToolName:  part.FunctionResponse.Name,
 					Result:    marshalString(part.FunctionResponse.Response),
 					Status:    toolStatus(part.FunctionResponse.Response),
@@ -118,7 +119,7 @@ func confirmationEvent(sessionID string, event *adksession.Event, functionCall *
 	if functionCall == nil {
 		return Event{}
 	}
-	toolID := firstNonEmpty(functionCall.ID, functionCall.Name)
+	toolID := global.FirstNonEmpty(functionCall.ID, functionCall.Name)
 	toolName := toolconfirmation.FunctionCallName
 	args := marshalString(functionCall.Args)
 	if original, err := toolconfirmation.OriginalCallFrom(functionCall); err == nil && original != nil {
@@ -159,13 +160,4 @@ func toolStatus(resp map[string]any) string {
 		return "error"
 	}
 	return "done"
-}
-
-func firstNonEmpty(values ...string) string {
-	for _, value := range values {
-		if value != "" {
-			return value
-		}
-	}
-	return ""
 }

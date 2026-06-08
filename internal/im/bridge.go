@@ -13,6 +13,7 @@ import (
 
 	"github.com/ai4next/pegasus/internal/bus"
 	"github.com/ai4next/pegasus/internal/config"
+	"github.com/ai4next/pegasus/internal/global"
 	pegasusruntime "github.com/ai4next/pegasus/internal/runtime"
 	adkrunner "google.golang.org/adk/runner"
 	adksession "google.golang.org/adk/session"
@@ -108,7 +109,7 @@ func (b *AgentBridge) runAndReply(ctx context.Context, client *Client, msg *Mess
 		case bus.EventTextDelta:
 			out.WriteString(event.Text)
 		case bus.EventPermissionRequested:
-			return fmt.Errorf("工具 %s 需要人工确认；当前 IM 接入暂不支持确认流程", firstNonEmpty(event.ToolName, event.ToolID))
+			return fmt.Errorf("工具 %s 需要人工确认；当前 IM 接入暂不支持确认流程", global.FirstNonEmpty(event.ToolName, event.ToolID))
 		case bus.EventRunFailed:
 			if event.Error != "" {
 				return errors.New(event.Error)
@@ -228,13 +229,4 @@ func nonEmpty(values []string) []string {
 		}
 	}
 	return out
-}
-
-func firstNonEmpty(values ...string) string {
-	for _, value := range values {
-		if value != "" {
-			return value
-		}
-	}
-	return ""
 }

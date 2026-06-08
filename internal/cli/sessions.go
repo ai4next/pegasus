@@ -428,7 +428,7 @@ func writeSessionShow(w io.Writer, svc adksession.Service, cfg *config.Config, u
 			fmt.Fprintf(w, " (%s)", msg.Status)
 		}
 		fmt.Fprintln(w)
-		text := firstNonEmpty(msg.Content, msg.Result, msg.Args)
+		text := global.FirstNonEmptyTrimmed(msg.Content, msg.Result, msg.Args)
 		if text != "" {
 			fmt.Fprintln(w, indentLines(strings.TrimSpace(text), "  "))
 		}
@@ -1128,15 +1128,6 @@ func indentLines(text, prefix string) string {
 		lines[i] = prefix + line
 	}
 	return strings.Join(lines, "\n")
-}
-
-func firstNonEmpty(values ...string) string {
-	for _, value := range values {
-		if strings.TrimSpace(value) != "" {
-			return value
-		}
-	}
-	return ""
 }
 
 func parseMessageRoles(value string) ([]pegasussession.MessageRole, error) {
