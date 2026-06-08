@@ -1501,7 +1501,7 @@ func matchPreview(text, query string, maxRunes int) string {
 	index := strings.Index(lowerText, lowerQuery)
 	runes := []rune(text)
 	if len(runes) <= maxRunes {
-		return strings.Join(strings.Fields(text), " ")
+		return global.TrimAndCollapse(text)
 	}
 	start := 0
 	if index >= 0 {
@@ -1518,7 +1518,7 @@ func matchPreview(text, query string, maxRunes int) string {
 	if end > len(runes) {
 		end = len(runes)
 	}
-	preview := strings.Join(strings.Fields(string(runes[start:end])), " ")
+	preview := global.TrimAndCollapse(string(runes[start:end]))
 	if start > 0 {
 		preview = "..." + preview
 	}
@@ -1749,7 +1749,7 @@ func snapshotContent(content string, missing bool) FileSnapshot {
 }
 
 func compactPreview(text string, maxRunes int) string {
-	text = strings.Join(strings.Fields(strings.TrimSpace(text)), " ")
+	text = global.TrimAndCollapse(text)
 	return previewContent(text, maxRunes)
 }
 
@@ -1808,15 +1808,11 @@ func defaultTitle(sessionID string) string {
 }
 
 func titleFromContent(content string) string {
-	content = strings.Join(strings.Fields(content), " ")
-	runes := []rune(content)
-	if len(runes) > 60 {
-		return string(runes[:59]) + "…"
-	}
+	content = global.TrimAndCollapse(content)
 	if content == "" {
 		return "New session"
 	}
-	return content
+	return global.TrimRunes(content, 60)
 }
 
 func filterEvents(events []*adksession.Event, limit int, after time.Time) []*adksession.Event {

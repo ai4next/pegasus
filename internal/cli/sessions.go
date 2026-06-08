@@ -1149,5 +1149,5 @@ func parseMessageRoles(value string) ([]pegasussession.MessageRole, error) {
 }
 
 func singleLine(value string) string {
-	return strings.Join(strings.Fields(value), " ")
+	return global.TrimAndCollapse(value)
 }

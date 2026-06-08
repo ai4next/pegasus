@@ -6,6 +6,7 @@ import (
 
 	tea "charm.land/bubbletea/v2"
 
+	"github.com/ai4next/pegasus/internal/global"
 	pegasussession "github.com/ai4next/pegasus/internal/session"
 	"github.com/ai4next/pegasus/internal/tui/components"
 )
@@ -234,15 +235,15 @@ func formatSearchReference(result pegasussession.MessageSearchResult) string {
 	if sessionID == "" {
 		return ""
 	}
-	preview := strings.Join(strings.Fields(result.Preview), " ")
+	preview := global.TrimAndCollapse(result.Preview)
 	if preview == "" {
-		preview = strings.Join(strings.Fields(result.Message.Content), " ")
+		preview = global.TrimAndCollapse(result.Message.Content)
 	}
 	if preview == "" {
-		preview = strings.Join(strings.Fields(result.Message.Result), " ")
+		preview = global.TrimAndCollapse(result.Message.Result)
 	}
 	if preview == "" {
-		preview = strings.Join(strings.Fields(result.Message.Args), " ")
+		preview = global.TrimAndCollapse(result.Message.Args)
 	}
 	if preview == "" {
 		preview = string(result.Message.Role)

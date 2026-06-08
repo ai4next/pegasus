@@ -269,7 +269,7 @@ func applyToolResultBudget(window *sessionContext) {
 }
 
 func persistedToolResultPlaceholder(msg *pegasussession.Message, result string) string {
-	preview := trimRunes(strings.Join(strings.Fields(result), " "), 2000)
+	preview := global.TrimRunes(global.TrimAndCollapse(result), 2000)
 	label := global.FirstNonEmpty(msg.ToolID, msg.ToolName, msg.ID, "unknown")
 	return fmt.Sprintf("<persisted-output>\nTool result %s exceeded the context budget and was compacted in session context.\nPreview:\n%s\n</persisted-output>", label, preview)
 }
@@ -337,17 +337,6 @@ func hasSessionContext(window sessionContext) bool {
 
 func compactContextText(values ...string) string {
 	text := strings.TrimSpace(strings.Join(values, " "))
-	text = strings.Join(strings.Fields(text), " ")
-	return trimRunes(text, contextMessagePreviewMaxRunes)
-}
-
-func trimRunes(text string, maxRunes int) string {
-	if maxRunes <= 0 {
-		return text
-	}
-	runes := []rune(text)
-	if len(runes) > maxRunes {
-		return string(runes[:maxRunes-1]) + "…"
-	}
-	return text
+	text = global.TrimAndCollapse(text)
+	return global.TrimRunes(text, contextMessagePreviewMaxRunes)
 }

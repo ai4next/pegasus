@@ -6,6 +6,7 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 
+	"github.com/ai4next/pegasus/internal/global"
 	pegasussession "github.com/ai4next/pegasus/internal/session"
 	"github.com/ai4next/pegasus/internal/tui/styles"
 )
@@ -227,7 +228,7 @@ func RenderSearchResults(data SearchResultsData, width, height int) string {
 				padRight(TruncateRunes(result.Metadata.SessionID, 12), 12) + " " +
 				padRight(string(result.Message.Role), 9) + " " +
 				TruncateRunes(result.Metadata.Title, max(8, inner-27))
-			preview := strings.Join(strings.Fields(result.Preview), " ")
+			preview := global.TrimAndCollapse(result.Preview)
 			if preview != "" {
 				header += "  " + TruncateRunes(preview, max(8, inner-lipgloss.Width(header)-2))
 			}

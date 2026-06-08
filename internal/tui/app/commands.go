@@ -6,6 +6,7 @@ import (
 
 	tea "charm.land/bubbletea/v2"
 
+	"github.com/ai4next/pegasus/internal/global"
 	pegasusagent "github.com/ai4next/pegasus/internal/agent"
 	pegasussession "github.com/ai4next/pegasus/internal/session"
 	"github.com/ai4next/pegasus/internal/tui/components"
@@ -325,7 +326,7 @@ func formatMessageSearchResults(query string, results []pegasussession.MessageSe
 			result.Message.Role,
 			components.TruncateRunes(result.Metadata.Title, 44),
 		))
-		preview := strings.Join(strings.Fields(result.Preview), " ")
+		preview := global.TrimAndCollapse(result.Preview)
 		if preview != "" {
 			b.WriteString("\n  ")
 			b.WriteString(components.TruncateRunes(preview, 180))

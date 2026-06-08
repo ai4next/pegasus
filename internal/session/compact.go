@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ai4next/pegasus/internal/global"
 	adksession "google.golang.org/adk/session"
 	"google.golang.org/genai"
 )
@@ -124,7 +125,7 @@ func compactMessageLine(msg Message) string {
 	default:
 		body = msg.Status
 	}
-	body = strings.Join(strings.Fields(body), " ")
+	body = global.TrimAndCollapse(body)
 	if body == "" {
 		return ""
 	}
