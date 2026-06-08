@@ -46,6 +46,7 @@ data/
 /pegasus
 /pegasus.exe
 /pg.exe
+/peggy
 
 # Python
 .venv
