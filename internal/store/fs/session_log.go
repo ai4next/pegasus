@@ -18,7 +18,7 @@ type LogMessage struct {
 
 func WriteSessionLogPath(path string, messages []LogMessage) error {
 	tmp := path + ".tmp"
-	if err := os.WriteFile(tmp, FormatSessionLog(messages), 0644); err != nil {
+	if err := os.WriteFile(tmp, FormatSessionLog(messages), 0600); err != nil {
 		return err
 	}
 	if err := os.Rename(tmp, path); err != nil {

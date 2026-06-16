@@ -53,7 +53,7 @@ func patchFile(tctx tool.Context, deps Dependencies, input filePatchInput) (file
 	}
 
 	newContent := strings.Replace(content, input.OldString, input.NewString, 1)
-	if err := os.WriteFile(abs, []byte(newContent), 0644); err != nil {
+	if err := os.WriteFile(abs, []byte(newContent), 0600); err != nil {
 		return filePatchOutput{}, fmt.Errorf("write failed: %w", err)
 	}
 
