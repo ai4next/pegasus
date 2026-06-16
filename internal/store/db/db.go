@@ -15,7 +15,7 @@ type DB struct {
 }
 
 func OpenPath(dbPath string) (*DB, error) {
-	if err := os.MkdirAll(filepath.Dir(dbPath), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(dbPath), 0700); err != nil {
 		return nil, fmt.Errorf("create sqlite db dir: %w", err)
 	}
 	gormDB, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{

@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"log"
 	"maps"
 	"os"
 	"path/filepath"
@@ -50,7 +51,7 @@ func NewServiceInRoot(rootDir string) (adksession.Service, error) {
 		userState:  make(map[string]map[string]map[string]any),
 		subs:       make(map[chan Event[Message]]struct{}),
 	}
-	if err := os.MkdirAll(s.sessionDir, 0755); err != nil {
+	if err := os.MkdirAll(s.sessionDir, 0700); err != nil {
 		return nil, fmt.Errorf("create session dir: %w", err)
 	}
 	registry, err := global.DBRegistry()
@@ -938,6 +939,12 @@ func (s *Service) load() error {
 		}
 		return fmt.Errorf("read session dir: %w", err)
 	}
+	// I/O done outside the lock; collect first.
+	type loaded struct {
+		stored storedSession
+		key    string
+	}
+	var loadedList []loaded
 	for _, entry := range entries {
 		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".json") {
 			continue
@@ -956,8 +963,18 @@ func (s *Service) load() error {
 		if stored.Files == nil {
 			stored.Files = make(map[string]SessionFile)
 		}
+		loadedList = append(loadedList, loaded{
+			stored: stored,
+			key:    sessionKey(stored.AppName, stored.UserID, stored.SessionID),
+		})
+	}
+	// Lock only for the map mutations.
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for _, l := range loadedList {
+		stored := l.stored
 		s.applyScopedStateLocked(stored.AppName, stored.UserID, stored.State)
-		s.sessions[sessionKey(stored.AppName, stored.UserID, stored.SessionID)] = &stored
+		s.sessions[l.key] = &stored
 	}
 	return nil
 }
@@ -967,6 +984,11 @@ func (s *Service) loadFromDB() error {
 	if err != nil {
 		return err
 	}
+	type loaded struct {
+		stored storedSession
+		key    string
+	}
+	var loadedList []loaded
 	for _, row := range rows {
 		stored := storedSession{
 			ID:               int64(row.ID),
@@ -997,8 +1019,18 @@ func (s *Service) loadFromDB() error {
 		if stored.Files == nil {
 			stored.Files = make(map[string]SessionFile)
 		}
+		loadedList = append(loadedList, loaded{
+			stored: stored,
+			key:    sessionKey(stored.AppName, stored.UserID, stored.SessionID),
+		})
+	}
+	// Lock only for the map mutations.
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for _, l := range loadedList {
+		stored := l.stored
 		s.applyScopedStateLocked(stored.AppName, stored.UserID, stored.State)
-		s.sessions[sessionKey(stored.AppName, stored.UserID, stored.SessionID)] = &stored
+		s.sessions[l.key] = &stored
 	}
 	return nil
 }
@@ -1106,7 +1138,7 @@ func (s *Service) mergedStateLocked(stored *storedSession) map[string]any {
 }
 
 func (s *Service) persistLocked(stored *storedSession) error {
-	if err := os.MkdirAll(s.sessionDir, 0755); err != nil {
+	if err := os.MkdirAll(s.sessionDir, 0700); err != nil {
 		return err
 	}
 	if s.db != nil {
@@ -1283,6 +1315,7 @@ func (s *Service) publishLocked(t EventType, msg Message) {
 		select {
 		case ch <- event:
 		default:
+			log.Printf("[session] subscriber channel full for event type %v, dropping", t)
 		}
 	}
 }
@@ -1300,11 +1333,11 @@ func (s *Service) writeSnapshotContent(content string, missing bool) error {
 	} else if !os.IsNotExist(err) {
 		return err
 	}
-	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(path), 0700); err != nil {
 		return err
 	}
 	tmp := path + ".tmp." + uuid.NewString()
-	if err := os.WriteFile(tmp, data, 0644); err != nil {
+	if err := os.WriteFile(tmp, data, 0600); err != nil {
 		return err
 	}
 	if err := os.Rename(tmp, path); err != nil {

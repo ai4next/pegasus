@@ -53,7 +53,7 @@ func writeFile(tctx tool.Context, deps Dependencies, input fileWriteInput) (file
 	before := string(beforeBytes)
 
 	dir := filepath.Dir(abs)
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0700); err != nil {
 		return fileWriteOutput{}, fmt.Errorf("create directory failed: %w", err)
 	}
 
@@ -64,7 +64,7 @@ func writeFile(tctx tool.Context, deps Dependencies, input fileWriteInput) (file
 		flag = os.O_TRUNC | os.O_CREATE | os.O_WRONLY
 	}
 
-	f, err := os.OpenFile(abs, flag, 0644)
+	f, err := os.OpenFile(abs, flag, 0600)
 	if err != nil {
 		return fileWriteOutput{}, fmt.Errorf("open file failed: %w", err)
 	}

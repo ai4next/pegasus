@@ -113,10 +113,10 @@ func (m *Model) revertFile(path string) error {
 		return nil
 	}
 
-	if err := os.MkdirAll(filepath.Dir(revision.Path), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(revision.Path), 0o700); err != nil {
 		return err
 	}
-	if err := os.WriteFile(revision.Path, []byte(before), 0o644); err != nil {
+	if err := os.WriteFile(revision.Path, []byte(before), 0o600); err != nil {
 		return err
 	}
 	if err := pegasussession.RecordFileRevision(m.sessionService, m.cfg.Session.AppName, "tui-user", m.sessionID, pegasussession.FileRevisionNote{Path: revision.Path, Action: "revert", Before: current, After: before, BeforeMissing: currentMissing}); err != nil {
