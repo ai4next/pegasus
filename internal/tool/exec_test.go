@@ -28,7 +28,7 @@ func TestExecToolUsesOSShell(t *testing.T) {
 }
 
 func TestRunExecRequiresCommand(t *testing.T) {
-	_, err := runExec(Dependencies{Config: &config.Config{}}, execInput{})
+	_, err := runExec(Dependencies{Config: &config.Config{}}, execInput{}, nil)
 	if err == nil || !strings.Contains(err.Error(), "command is required") {
 		t.Fatalf("err = %v, want command required", err)
 	}

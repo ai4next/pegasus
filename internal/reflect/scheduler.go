@@ -62,6 +62,8 @@ func (s *Scheduler) Start(ctx context.Context) {
 		select {
 		case <-s.stopCh:
 			return
+		case <-ctx.Done():
+			return
 		case <-ticker.C:
 			tasks := s.loadTasks(tasksDir)
 			for _, task := range tasks {

@@ -166,7 +166,18 @@ func (q *ChannelQueue) Fail(taskID string, failure TaskFailure) error {
 	if failure.Retryable && task.Attempt < task.MaxAttempts {
 		task.Status = TaskStatusReady
 		q.tasks[task.ID] = task
-		q.ready <- task.ID
+		select {
+		case q.ready <- task.ID:
+		default:
+			task.Status = TaskStatusDead
+			q.tasks[task.ID] = task
+			event = Event{Type: EventTaskDead, At: now, TaskID: task.ID, Error: "queue full on retry: " + failure.Error, Metadata: task.Payload}
+			q.appendEventLocked(event)
+			broker := q.broker
+			q.mu.Unlock()
+			publishTaskEvent(broker, event)
+			return nil
+		}
 		event = Event{Type: EventTaskRetrying, At: now, TaskID: task.ID, Error: failure.Error, Metadata: task.Payload}
 	} else {
 		task.Status = TaskStatusDead

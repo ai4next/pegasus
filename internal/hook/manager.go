@@ -235,7 +235,11 @@ func (m *Manager) signalAfterRun(ic agent.InvocationContext) {
 	if m.evolutionCh != nil {
 		signal := m.signal
 		signal.SessionID = sid
-		m.evolutionCh <- signal
+		select {
+		case m.evolutionCh <- signal:
+		default:
+			log.Printf("[hook] evolution channel full, dropping signal for session %s", sid)
+		}
 	}
 }
 

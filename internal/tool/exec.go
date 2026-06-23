@@ -37,7 +37,7 @@ func init() {
 
 func newExecTool(deps Dependencies) tool.Tool {
 	handler := func(tctx tool.Context, input execInput) (execOutput, error) {
-		return runExec(deps, input)
+		return runExec(deps, input, tctx)
 	}
 	t, _ := functiontool.New(functiontool.Config{
 		Name:        "exec",
@@ -46,9 +46,13 @@ func newExecTool(deps Dependencies) tool.Tool {
 	return t
 }
 
-func runExec(deps Dependencies, input execInput) (execOutput, error) {
+func runExec(deps Dependencies, input execInput, tctx tool.Context) (execOutput, error) {
 	timeout := deps.Config.Tools.Exec.Timeout.AsDuration()
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	baseCtx := context.Background()
+	if tctx != nil {
+		baseCtx = tctx
+	}
+	ctx, cancel := context.WithTimeout(baseCtx, timeout)
 	defer cancel()
 
 	if strings.TrimSpace(input.Command) == "" {

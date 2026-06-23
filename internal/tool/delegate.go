@@ -54,7 +54,7 @@ func newDelegateTool(deps Dependencies) tool.Tool {
 	}
 
 	handler := func(tctx tool.Context, input delegateInput) (delegateOutput, error) {
-		return runDelegateTool(context.Background(), deps, input)
+		return runDelegateTool(tctx, deps, input)
 	}
 	t, _ := functiontool.New(functiontool.Config{
 		Name:        "delegate",

@@ -33,7 +33,7 @@ func newOrchestrateTool(deps Dependencies) tool.Tool {
 		if deps.Orchestrator == nil {
 			return orchestrateOutput{}, fmt.Errorf("orchestrator not available")
 		}
-		receipt, err := deps.Orchestrator.SubmitPlan(context.Background(), input.PlanJSON)
+		receipt, err := deps.Orchestrator.SubmitPlan(tctx, input.PlanJSON)
 		if err != nil {
 			return orchestrateOutput{}, err
 		}

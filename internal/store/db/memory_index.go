@@ -138,7 +138,7 @@ func (d *DB) searchMemoryFallbackIndex(query string, docs []MemoryDocumentRow) (
 			Path:      row.Path,
 			Title:     row.Title,
 			Score:     500 + float64(matches),
-			MatchType: "fts",
+			MatchType: "scan",
 			Snippet:   memorySnippet(row.Content, terms),
 		})
 	}
