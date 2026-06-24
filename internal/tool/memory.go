@@ -1,7 +1,6 @@
 package tool
 
 import (
-	"context"
 	"strings"
 
 	"google.golang.org/adk/tool"
@@ -23,7 +22,7 @@ type memorySearchOutput struct {
 
 func newMemorySearchTool(deps Dependencies) tool.Tool {
 	handler := func(tctx tool.Context, input memorySearchInput) (memorySearchOutput, error) {
-		return runMemorySearch(tctx, deps, input)
+		return runMemorySearch(deps, input)
 	}
 	t, _ := functiontool.New(functiontool.Config{
 		Name:        "memory_search",
@@ -32,8 +31,7 @@ func newMemorySearchTool(deps Dependencies) tool.Tool {
 	return t
 }
 
-func runMemorySearch(ctx context.Context, deps Dependencies, input memorySearchInput) (memorySearchOutput, error) {
-	_ = ctx
+func runMemorySearch(deps Dependencies, input memorySearchInput) (memorySearchOutput, error) {
 	svc := memory.NewSearchService(deps.Config)
 	results, err := svc.Search(memory.SearchOptions{
 		Query:  input.Query,

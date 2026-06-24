@@ -255,11 +255,12 @@ func (s *Service) listL2SOPNames() []string {
 }
 
 func bracketList(values []string, maxItems int) string {
-	if len(values) > maxItems {
-		values = append(values[:maxItems], "etc...")
-	}
 	if len(values) == 0 {
 		return ""
+	}
+	if len(values) > maxItems {
+		values = append(make([]string, 0, maxItems+1), values[:maxItems]...)
+		values = append(values, "etc...")
 	}
 	return "[" + strings.Join(values, ", ") + "]"
 }
